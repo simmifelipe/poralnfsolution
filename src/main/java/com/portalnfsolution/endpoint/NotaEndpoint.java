@@ -1,14 +1,15 @@
 package com.portalnfsolution.endpoint;
 
+import com.portalnfsolution.exception.ResourceNotFoundException;
 import com.portalnfsolution.model.Nota;
 import com.portalnfsolution.repository.NotaRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.time.LocalDate;
 
 /**
@@ -22,75 +23,85 @@ public class NotaEndpoint {
     private final NotaRepository repository;
 
     @Autowired
-    public NotaEndpoint(NotaRepository repository){
+    public NotaEndpoint(NotaRepository repository) {
         this.repository = repository;
     }
 
-    @GetMapping("/protegido/notas")
-    public ResponseEntity<?> listarTodos(){
-        return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
+    private void verificaSeNotaExiste(String cnpj, String numero, String serie) {
+        Nota nota = repository.findNotaByCnpjEmitenteAndNumeroAndSerie(cnpj, numero, Integer.valueOf(serie));
+        if (nota == null) {
+            throw new ResourceNotFoundException("Nota não encontrada com estes parametros: " +
+                    "Cnpj -> " + cnpj + " | " +
+                    "Número -> " + numero + " | " +
+                    "Série -> " + serie
+            );
+        }
     }
 
-    @GetMapping("/protegido/notas/{cnpj}")
-    public ResponseEntity<?> porCnpj(@PathVariable("cnpj") String cnpj){
+    @GetMapping(path = "/protegido/notas")
+    public ResponseEntity<?> listarTodos(Pageable pageable) {
+        return new ResponseEntity<>(repository.findAll(pageable), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/protegido/notas/{cnpj}")
+    public ResponseEntity<?> porCnpj(@PathVariable("cnpj") String cnpj) {
         return new ResponseEntity<>(repository.findNotaByCnpjEmitente(cnpj), HttpStatus.OK);
     }
 
-    @GetMapping("/protegido/notas/{cnpj}/{dataEmissao}")
+    @GetMapping(path = "/protegido/notas/{cnpj}/{dataEmissao}")
     public ResponseEntity<?> porCnpjEDataEmissao(
-            @PathVariable("cnpj") String cnpj, @PathVariable("dataEmissao") String dataEmissao){
+            @PathVariable("cnpj") String cnpj, @PathVariable("dataEmissao") String dataEmissao, Pageable pageable) {
         LocalDate data = LocalDate.parse(dataEmissao);
-        return new ResponseEntity<>(repository.findNotaByCnpjEmitenteAndDataEmissao(cnpj, data), HttpStatus.OK);
+        return new ResponseEntity<>(repository.findNotaByCnpjEmitenteAndDataEmissao(cnpj, data, pageable), HttpStatus.OK);
     }
 
-    @GetMapping("/protegido/notas/data/{dataEmissao}")
-    public ResponseEntity<?> porDataEmissao(@PathVariable("dataEmissao") String dataEmissao){
+    @GetMapping(path = "/protegido/notas/data/{dataEmissao}")
+    public ResponseEntity<?> porDataEmissao(@PathVariable("dataEmissao") String dataEmissao) {
         LocalDate data = LocalDate.parse(dataEmissao);
         return new ResponseEntity<>(repository.findNotaByDataEmissao(data), HttpStatus.OK);
     }
 
-    @GetMapping("/protegido/notas/situacao/{situacao}")
-    public ResponseEntity<?> porSituacao(@PathVariable("situacao") String situacao){
+    @GetMapping(path = "/protegido/notas/situacao/{situacao}")
+    public ResponseEntity<?> porSituacao(@PathVariable("situacao") String situacao) {
         return new ResponseEntity<>(repository.findNotaBySituacao(situacao), HttpStatus.OK);
     }
 
-    @GetMapping("/protegido/notas/chave/{chave}")
-    public ResponseEntity<?> porChave(@PathVariable("chave") String chave){
+    @GetMapping(path = "/protegido/notas/chave/{chave}")
+    public ResponseEntity<?> porChave(@PathVariable("chave") String chave) {
         return new ResponseEntity<>(repository.findNotaByChave(chave), HttpStatus.OK);
     }
 
-    @GetMapping("/protegido/notas/destinatario/{destinatario}")
-    public ResponseEntity<?> porDestinatario(@PathVariable("destinatario") String destinatario){
+    @GetMapping(path = "/protegido/notas/destinatario/{destinatario}")
+    public ResponseEntity<?> porDestinatario(@PathVariable("destinatario") String destinatario) {
         return new ResponseEntity<>(repository.findNotaByDestinatarioIgnoringCaseContaining(destinatario), HttpStatus.OK);
     }
 
-    @GetMapping("/protegido/notas/{cnpj}/{numero}/{serie}")
+    @GetMapping(path = "/protegido/notas/{cnpj}/{numero}/{serie}")
     public ResponseEntity<?> porCnpjENumeroESerie(
-            @PathVariable("cnpj") String cnpj, @PathVariable("numero") String numero, @PathVariable("serie") String serie){
+            @PathVariable("cnpj") String cnpj, @PathVariable("numero") String numero, @PathVariable("serie") String serie) {
         Integer sr = Integer.valueOf(serie);
         numero = StringUtils.leftPad(numero, 9, "0");
         return new ResponseEntity<>(repository.findNotaByCnpjEmitenteAndNumeroAndSerie(cnpj, numero, sr), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/protegido/notas", method = RequestMethod.POST)
+    @PostMapping(path = "/protegido/notas")
     public ResponseEntity<?> salvar(@RequestBody Nota nota) {
         return new ResponseEntity<>(repository.save(nota), HttpStatus.CREATED);
     }
 
+    @PutMapping(path = "/protegido/notas")
+    public ResponseEntity<?> atualizar(@RequestBody Nota nota) {
+        verificaSeNotaExiste(nota.getCnpjEmitente(), nota.getNumero(), String.valueOf(nota.getSerie()));
+        repository.save(nota);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    @DeleteMapping(path = "/protegido/notas")
+    public ResponseEntity<?> remover(@RequestBody Nota nota) {
+        verificaSeNotaExiste(nota.getCnpjEmitente(), nota.getNumero(), String.valueOf(nota.getSerie()));
+        repository.delete(nota);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 
 }

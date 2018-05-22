@@ -1,6 +1,7 @@
 package com.portalnfsolution.repository;
 
 import com.portalnfsolution.model.Nota;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.time.LocalDate;
@@ -12,7 +13,7 @@ public interface NotaRepository extends PagingAndSortingRepository<Nota, Long> {
 
     List<Nota> findNotaByCnpjEmitente(String cnpj);
 
-    List<Nota> findNotaByCnpjEmitenteAndDataEmissao(String cnpj, LocalDate dataEmissao);
+    List<Nota> findNotaByCnpjEmitenteAndDataEmissao(String cnpj, LocalDate dataEmissao, Pageable pageable);
 
     List<Nota> findNotaByDataEmissao(LocalDate dataEmissao);
 
@@ -22,7 +23,7 @@ public interface NotaRepository extends PagingAndSortingRepository<Nota, Long> {
 
     List<Nota> findNotaByDestinatarioIgnoringCaseContaining(String destinatario);
 
-    List<Nota> findNotaByCnpjEmitenteAndNumeroAndSerie(String cnpj, String numero,Integer serie);
+    Nota findNotaByCnpjEmitenteAndNumeroAndSerie(String cnpj, String numero,Integer serie);
 
 
 }
