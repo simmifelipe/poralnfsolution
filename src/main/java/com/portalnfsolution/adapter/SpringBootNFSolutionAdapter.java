@@ -12,8 +12,8 @@ import java.util.List;
 /**
  * Created by felipe.simmi on 20/10/2017.
  */
-@Configuration
-public class SpringBootEssentialsAdapter implements WebMvcConfigurer {
+//@Configuration
+public class SpringBootNFSolutionAdapter implements WebMvcConfigurer {
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {

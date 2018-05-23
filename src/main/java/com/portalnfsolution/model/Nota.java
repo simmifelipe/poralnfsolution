@@ -1,10 +1,7 @@
 package com.portalnfsolution.model;
 
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -66,8 +63,30 @@ public class Nota implements Serializable {
     @Column
     private boolean sincronizada;
 
+    public Nota() {
+    }
+
+    public Nota(Long id, String chave, String numero, String cnpjEmitente, Integer serie, LocalDate dataEmissao,
+                LocalDate dataAutorizacao, String protocolo, String modelo, BigDecimal valotTotal, String situacao) {
+        this.id = id;
+        this.chave = chave;
+        this.numero = numero;
+        this.cnpjEmitente = cnpjEmitente;
+        this.serie = serie;
+        this.dataEmissao = dataEmissao;
+        this.dataAutorizacao = dataAutorizacao;
+        this.protocolo = protocolo;
+        this.modelo = modelo;
+        this.valotTotal = valotTotal;
+        this.situacao = situacao;
+    }
+
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getChave() {

@@ -44,8 +44,8 @@ public class NotaEndpoint {
     }
 
     @GetMapping(path = "/protegido/notas/{cnpj}")
-    public ResponseEntity<?> porCnpj(@PathVariable("cnpj") String cnpj) {
-        return new ResponseEntity<>(repository.findNotaByCnpjEmitente(cnpj), HttpStatus.OK);
+    public ResponseEntity<?> porCnpj(@PathVariable("cnpj") String cnpj, Pageable pageable) {
+        return new ResponseEntity<>(repository.findNotaByCnpjEmitente(cnpj, pageable), HttpStatus.OK);
     }
 
     @GetMapping(path = "/protegido/notas/{cnpj}/{dataEmissao}")
@@ -56,14 +56,14 @@ public class NotaEndpoint {
     }
 
     @GetMapping(path = "/protegido/notas/data/{dataEmissao}")
-    public ResponseEntity<?> porDataEmissao(@PathVariable("dataEmissao") String dataEmissao) {
+    public ResponseEntity<?> porDataEmissao(@PathVariable("dataEmissao") String dataEmissao, Pageable pageable) {
         LocalDate data = LocalDate.parse(dataEmissao);
-        return new ResponseEntity<>(repository.findNotaByDataEmissao(data), HttpStatus.OK);
+        return new ResponseEntity<>(repository.findNotaByDataEmissao(data, pageable), HttpStatus.OK);
     }
 
     @GetMapping(path = "/protegido/notas/situacao/{situacao}")
-    public ResponseEntity<?> porSituacao(@PathVariable("situacao") String situacao) {
-        return new ResponseEntity<>(repository.findNotaBySituacao(situacao), HttpStatus.OK);
+    public ResponseEntity<?> porSituacao(@PathVariable("situacao") String situacao, Pageable pageable) {
+        return new ResponseEntity<>(repository.findNotaBySituacao(situacao, pageable), HttpStatus.OK);
     }
 
     @GetMapping(path = "/protegido/notas/chave/{chave}")
@@ -72,8 +72,8 @@ public class NotaEndpoint {
     }
 
     @GetMapping(path = "/protegido/notas/destinatario/{destinatario}")
-    public ResponseEntity<?> porDestinatario(@PathVariable("destinatario") String destinatario) {
-        return new ResponseEntity<>(repository.findNotaByDestinatarioIgnoringCaseContaining(destinatario), HttpStatus.OK);
+    public ResponseEntity<?> porDestinatario(@PathVariable("destinatario") String destinatario, Pageable pageable) {
+        return new ResponseEntity<>(repository.findNotaByDestinatarioIgnoringCaseContaining(destinatario, pageable), HttpStatus.OK);
     }
 
     @GetMapping(path = "/protegido/notas/{cnpj}/{numero}/{serie}")
